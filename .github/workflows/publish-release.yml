@@ -1,0 +1,25 @@
+name: Create new release
+
+on:
+  push:
+
+jobs:
+  create-new-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get date and description 
+        run: |
+          DATE=$(grep '^## [0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}' CHANGELOG.md | head -n 1 | awk '{print $2}')
+          L=$(nl -v0 -ba CHANGELOG.md | grep '## [0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}' - | head -n 2 | awk '{print $1}')
+          DESCRIPTION=$(cat CHANGELOG.md |head -n $(echo $L | cut -d' ' -f 2) | tac | head -n -$(echo $L | cut -d' ' -f 1) | head -n -1 | tac)
+          echo "Result"
+          echo $DATE
+          echo $DESCRIPTION
